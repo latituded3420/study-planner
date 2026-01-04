@@ -1,3 +1,5 @@
+115
+120
 # Personalized Study Planner
 
 A comprehensive full-stack web application designed to help students prepare efficiently for exams with automated study scheduling, subject tracking, Pomodoro timer, and real-time progress monitoring.
@@ -121,12 +123,63 @@ The smart allocation algorithm considers:
 
 Formula: `Allocated Hours = (Subject Weight / Total Weight) × Daily Hours`
 
-## 📊 What I Learned
+## 📊 125
+130
+
 
 - Full-stack web application development
 - Responsive design and mobile optimization
 - JavaScript ES6+ features (classes, async/await, event listeners)
-- Algorithm design for smart scheduling
+126
+  ## 📸 Screenshots
+
+### Study Planner Application Interface
+
+The application features a modern, responsive design with three main sections:
+
+**Left Panel - Subject Management:**
+- Add subjects with exam dates, priority levels, and study hours
+- Configure study settings (daily hours available, study start date)
+- Blue, green, and cyan color scheme for the interface
+
+**Center Panel - Study Plan & Pomodoro Timer:**
+- Visual study plan display showing allocated study hours
+- Pomodoro timer with 25-minute focus sessions and 5-minute breaks (customizable)
+- Large, easy-to-read timer display in yellow digits (25:00)
+- Control buttons: Start, Pause, Reset, Next
+- Sound alerts toggle for timer notifications
+
+**Right Panel - Progress & Exams:**
+- Overall progress tracking with percentage completion
+- Today's progress visualization
+- Upcoming exams list (sorted by urgency, next 7 days)
+- Real-time progress bar updates
+
+### Key Visual Features
+
+1. **Color-Coded Interface**:
+   - Blue: Subject management and core features
+   - Green: Study plan section
+   - Yellow: Pomodoro timer for visibility
+   - Gray: Progress tracking
+   - Red: Upcoming exams section
+
+2. **Responsive Design**:
+   - Works seamlessly on desktop, tablet, and mobile
+   - Bootstrap 5 grid layout for flexible spacing
+   - Adaptive card-based UI
+
+3. **Real-Time Updates**:
+   - Timer counts down second by second
+   - Progress bars update automatically
+   - Subject list refreshes instantly
+
+4. **Dark/Light Theme Support**:
+   - Toggle between themes for comfortable studying
+   - Persistent theme preference using localStorage
+
+---
+  - Algorithm design for smart scheduling
 - DOM manipulation and real-time UI updates
 - Time management with Pomodoro technique
 - Data persistence with localStorage
