@@ -1,1 +1,150 @@
-<!DOCTYPE html><html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width'><title>Study Planner</title><link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet'><link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css' rel='stylesheet'><style>body{background:#667eea;padding:20px}.app-header{background:white;padding:20px;border-radius:10px;margin-bottom:20px}.main-content{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:20px;margin-bottom:20px}@media(max-width:1024px){.main-content{grid-template-columns:1fr}}.panel{background:white;border-radius:10px;padding:20px;box-shadow:0 4px 6px rgba(0,0,0,0.1)}.timer-display{font-size:3rem;font-weight:bold;text-align:center;color:#ffc107;font-family:monospace;padding:20px;background:#f0f0f0;border-radius:10px}input,select{width:100%;padding:8px;margin-bottom:8px;border:1px solid #ddd;border-radius:5px}.btn{padding:10px;margin:5px 0;cursor:pointer}body.light-mode{background:#f0f2f5}</style></head><body><div class='container-fluid'><header class='app-header'><h1><i class='fas fa-book'></i> Study Planner</h1></header><div class='main-content'><div class='panel'><h3>Subjects</h3><input type='text' id='subjectName' placeholder='Subject'><input type='date' id='examDate'><select id='priority'><option>High</option><option selected>Medium</option><option>Low</option></select><input type='number' id='studyHours' value='20'><button class='btn btn-primary' onclick='addSubject()' style='width:100%'>Add Subject</button><div id='subjectsList' style='margin-top:15px'></div></div><div class='panel'><h3>Study Settings</h3><input type='number' id='dailyHours' value='6' placeholder='Daily hours'><input type='date' id='studyStartDate'><button class='btn btn-success' onclick='generatePlan()' style='width:100%'>Generate Plan</button><div id='studyPlanDisplay' class='d-none'></div><h5 style='margin-top:20px'>Pomodoro Timer</h5><div class='timer-display' id='timerDisplay'>25:00</div><div style='text-align:center;margin:10px 0'><span id='timerStatus'>Ready</span></div><div style='text-align:center'><button class='btn btn-success' onclick='startTimer()' id='startBtn'>Start</button><button class='btn btn-warning' onclick='pauseTimer()'>Pause</button><button class='btn btn-secondary' onclick='resetTimer()' id='resetBtn2'>Reset</button><button class='btn btn-info' onclick='nextPhase()'>Next</button></div><div style='margin-top:10px'><label>Session (mins): <input type='number' id='sessionDuration' value='25' min='1' max='60' style='width:80px'></label><label>Break (mins): <input type='number' id='breakDuration' value='5' min='1' max='30' style='width:80px'></label></div><label><input type='checkbox' id='soundToggle' checked> Sound Alerts</label></div><div class='panel'><h3>Progress</h3><h5>Overall Progress</h5><div style='margin-bottom:15px'><div style='font-size:1.5rem;color:#28a745;margin-bottom:5px'><span id='overallPercent'>0%</span></div><div class='progress' style='height:25px'><div class='progress-bar bg-success' id='overallBar' style='width:0%'></div></div></div><h5>Today Progress</h5><div style='margin-bottom:15px'><div style='font-size:1.5rem;color:#17a2b8;margin-bottom:5px'><span id='todayPercent'>0%</span></div><div class='progress' style='height:25px'><div class='progress-bar bg-info' id='todayBar' style='width:0%'></div></div></div><h5>Upcoming Exams</h5><div id='upcomingExams' style='font-size:0.9rem'></div><h5 style='margin-top:15px'>Study Sessions</h5><div id='sessionsList' style='font-size:0.9rem'></div></div></div></div><input type='file' id='importFile' class='d-none' accept='.json'><script src='https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js'></script><script src='js/script.js'></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .app-header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 1024px) {
+            .main-content { grid-template-columns: 1fr; }
+        }
+        .panel {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .timer-display {
+            font-size: 3rem;
+            font-weight: bold;
+            text-align: center;
+            color: #ffc107;
+            font-family: monospace;
+            padding: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .btn { padding: 10px; margin: 5px 0; }
+        input, select { margin-bottom: 10px; }
+        .subject-card {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+        .progress-bar-animated { animation: progress-bar-stripes 1s linear infinite; }
+        body.light-mode { background: #f0f2f5; }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <h1><i class="fas fa-book"></i> Study Planner</h1>
+    </div>
+
+    <div class="main-content">
+        <!-- Left Panel: Subjects -->
+        <div class="panel">
+            <h3>Subjects</h3>
+            <input type="text" id="subjectName" class="form-control" placeholder="Subject Name">
+            <input type="date" id="examDate" class="form-control">
+            <select id="priority" class="form-control">
+                <option value="low">Low Priority</option>
+                <option value="medium" selected>Medium Priority</option>
+                <option value="high">High Priority</option>
+            </select>
+            <input type="number" id="studyHours" class="form-control" value="20" placeholder="Total hours needed">
+            <button id="addSubjectBtn" class="btn btn-primary w-100">Add Subject</button>
+            
+            <h5 style="margin-top: 20px;">My Subjects</h5>
+            <div id="subjectsList"></div>
+        </div>
+
+        <!-- Center Panel: Timer & Plan -->
+        <div class="panel">
+            <h3>Pomodoro Timer</h3>
+            <div class="timer-display" id="timerDisplay">25:00</div>
+            <div id="timerStatus" style="text-align: center; margin-bottom: 20px;">Ready 🎯</div>
+            
+            <div style="display: flex; gap: 10px;">
+                <button id="startBtn" class="btn btn-success flex-fill">Start</button>
+                <button id="pauseBtn" class="btn btn-warning flex-fill">Pause</button>
+                <button id="resetBtn2" class="btn btn-secondary flex-fill">Reset</button>
+                <button id="nextBtn" class="btn btn-info flex-fill">Next</button>
+            </div>
+
+            <div style="margin: 20px 0;">
+                <label>Session (mins): <input type="number" id="sessionDuration" value="25" min="1" max="60" style="width: 80px;"></label>
+                <label>Break (mins): <input type="number" id="breakDuration" value="5" min="1" max="30" style="width: 80px;"></label>
+                <label><input type="checkbox" id="soundToggle" checked> Sound Alerts</label>
+            </div>
+
+            <hr>
+            <h4>Generate Study Plan</h4>
+            <input type="number" id="dailyHours" class="form-control" value="6" placeholder="Daily hours available">
+            <input type="date" id="studyStartDate" class="form-control">
+            <button id="generatePlanBtn" class="btn btn-info w-100">Generate Plan</button>
+            
+            <div id="studyPlanDisplay" class="d-none" style="margin-top: 20px;">
+                <h5>Your Study Plan</h5>
+                <div id="planContent"></div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Progress & Sessions -->
+        <div class="panel">
+            <h3>Progress</h3>
+            
+            <h5>Overall Progress</h5>
+            <div class="progress">
+                <div id="overallBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+            </div>
+            <span id="overallPercent">0%</span>
+
+            <h5 style="margin-top: 20px;">Today's Progress</h5>
+            <div class="progress">
+                <div id="todayBar" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+            </div>
+            <span id="todayPercent">0%</span>
+
+            <h5 style="margin-top: 20px;">Upcoming Exams</h5>
+            <div id="upcomingExams" style="font-size: 0.9rem;"></div>
+
+            <h5 style="margin-top: 20px;">Today's Sessions</h5>
+            <div id="sessionsList" style="font-size: 0.9rem;"></div>
+
+            <hr>
+            <button id="exportBtn" class="btn btn-outline-success btn-sm w-100">Export Data</button>
+            <button id="importBtn" class="btn btn-outline-info btn-sm w-100">Import Data</button>
+            <button id="resetBtn" class="btn btn-outline-danger btn-sm w-100">Reset All</button>
+            <button id="themeToggle" class="btn btn-outline-secondary btn-sm w-100">Toggle Theme</button>
+            
+            <input type="file" id="importFile" class="d-none" accept=".json">
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/day.js@1.10.7/dayjs.min.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
