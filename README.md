@@ -1,5 +1,4 @@
-115
-120
+
 # Personalized Study Planner
 
 A comprehensive full-stack web application designed to help students prepare efficiently for exams with automated study scheduling, subject tracking, Pomodoro timer, and real-time progress monitoring.
@@ -123,15 +122,15 @@ The smart allocation algorithm considers:
 
 Formula: `Allocated Hours = (Subject Weight / Total Weight) × Daily Hours`
 
-## 📊 125
-130
+## 
 
 
 - Full-stack web application development
 - Responsive design and mobile optimization
 - JavaScript ES6+ features (classes, async/await, event listeners)
-126
+
   ## 📸 Screenshots
+<img width="808" height="683" alt="image" src="https://github.com/user-attachments/assets/6c772651-a103-4df5-9f18-b2955e76f48d" />
 
 ### Study Planner Application Interface
 
