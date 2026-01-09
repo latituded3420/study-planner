@@ -230,6 +230,56 @@
             display: flex;
             flex-direction: column;
         }
+         .note-card {
+ background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+ padding: 15px;
+ border-radius: 8px;
+ margin-bottom: 12px;
+ border-left: 4px solid #667eea;
+ box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+ display: flex;
+ justify-content: space-between;
+ align-items: flex-start;
+ }
+ .note-content h4 {
+ color: #333;
+ margin: 0 0 5px 0;
+ font-size: 15px;
+ word-break: break-word;
+ }
+ .note-content p {
+ color: #666;
+ margin: 0 0 5px 0;
+ font-size: 13px;
+ line-height: 1.4;
+ word-break: break-word;
+ }
+ .note-tag {
+ display: inline-block;
+ background: #667eea;
+ color: white;
+ padding: 3px 8px;
+ border-radius: 12px;
+ font-size: 11px;
+ margin-top: 5px;
+ }
+ .note-actions {
+ display: flex;
+ gap: 5px;
+ }
+ .btn-edit {
+ background: #17a2b8;
+ color: white;
+ border: none;
+ padding: 5px 8px;
+ border-radius: 4px;
+ cursor: pointer;
+ font-size: 11px;
+ }
+ .btn-edit:hover {
+ background: #138496;
+ }
+
     </style>
 </head>
 <body>
@@ -375,6 +425,22 @@
                     <div class="empty-state">No sessions today</div>
                 </div>
             </div>
+            	<!-- Quick Notes & Study Cards -->
+	<div class="card">
+		<h2>Quick Notes & Study Cards</h2>
+        		<div class="form-group">
+			<label>Add Note</label>
+			<textarea id="noteInput" placeholder="Write your quick note or flashcard here..." style="width: 100%; padding: 10px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; resize: vertical; min-height: 80px; font-family: inherit;"></textarea>
+		</div>
+        		<div class="form-group">
+			<label>Tag (Optional)</label>
+			<input type="text" id="noteTag" placeholder="e.g., Math, Physics, Important">
+		</div>
+        		<button class="btn-submit" id="addNoteBtn" style="margin-bottom: 20px;">Add Note</button>
+        		<div id="notesList" style="max-height: 400px; overflow-y: auto;">
+			<div class="empty-state">No notes added yet</div>
+		</div>
+        	</div>
         </div>
 
         <!-- Hidden file input for import -->
@@ -383,5 +449,83 @@
 
     <script src="https://cdn.jsdelivr.net/npm/day.js@1.10.7/dayjs.min.js"></script>
     <script src="js/script.js"></script>
+     <script>
+ // Notes/Study Cards Feature
+ let notes = JSON.parse(localStorage.getItem('studyNotes')) || [];
+
+ const addNoteBtn = document.getElementById('addNoteBtn');
+ const noteInput = document.getElementById('noteInput');
+ const noteTag = document.getElementById('noteTag');
+ const notesList = document.getElementById('notesList');
+
+ // Load notes on page load
+ function renderNotes() {
+ notesList.innerHTML = '';
+ if (notes.length === 0) {
+ notesList.innerHTML = '<div class="empty-state">No notes added yet</div>';
+ } else {
+ notes.forEach((note, index) => {
+ const noteCard = document.createElement('div');
+ noteCard.className = 'note-card';
+ noteCard.innerHTML = `
+ <div class="note-content">
+ <h4>${note.title || 'Untitled Note'}</h4>
+ <p>${note.content}</p>
+ ${note.tag ? `<span class="note-tag">${note.tag}</span>` : ''}
+ </div>
+ <div class="note-actions">
+ <button class="btn-delete" onclick="deleteNote(${index})">Delete</button>
+ </div>
+ `;
+ notesList.appendChild(noteCard);
+ });
+ }
+ }
+
+ // Add new note
+ addNoteBtn.addEventListener('click', function() {
+ const content = noteInput.value.trim();
+ const tag = noteTag.value.trim();
+
+ if (content === '') {
+ alert('Please write a note!');
+ return;
+ }
+
+ const note = {
+ content: content,
+ tag: tag,
+ timestamp: new Date().toLocaleString()
+ };
+
+ notes.unshift(note);
+ localStorage.setItem('studyNotes', JSON.stringify(notes));
+
+ // Clear inputs
+ noteInput.value = '';
+ noteTag.value = '';
+
+ renderNotes();
+ });
+
+ // Delete note
+ function deleteNote(index) {
+ if (confirm('Delete this note?')) {
+ notes.splice(index, 1);
+ localStorage.setItem('studyNotes', JSON.stringify(notes));
+ renderNotes();
+ }
+ }
+
+ // Allow Enter key to add note
+ noteInput.addEventListener('keypress', function(e) {
+ if (e.key === 'Enter' && e.ctrlKey) {
+ addNoteBtn.click();
+ }
+ });
+
+ // Initial render
+ renderNotes();
+ </script>
 </body>
 </html>
